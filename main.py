@@ -7,6 +7,15 @@ from math import pi
 
 # ORIGINAL ORBITAL PERIOD FUNCTION
 def Orbital_Period(Mass_SM: float, Orbital_Distance_AU: float) -> float:
+    '''
+    Calculates the orbital period using central mass
+    and orbital distance. Returns the period in days.
+    Args:
+    Mass_SM : float, mass of the central object in solar mass(1.989e30kg)
+    Orbital_Distance_AU : float, distance of object from center in AU (1.496e11m)
+    Returns:
+    Orbital Period : float, orbital period in days
+    '''
     Gravitational_Constant = 6.6743 * (10 ** -11)
     Sun_Mass_kg = 1.989 * (10 ** 30)
 
@@ -20,6 +29,11 @@ def Orbital_Period(Mass_SM: float, Orbital_Distance_AU: float) -> float:
         Period = (((Numerator / Denominator) *
                    (Orbital_Distance_m ** 3)) ** 0.5) / 86400
         return round(Period, 2)
+    
+# TESTS FOR ORBITAL PERIOD
+assert_equal(Orbital_Period(1, 1), 365.25)
+assert_equal(Orbital_Period(1, 4), 2922.0)
+assert_equal(Orbital_Period(1, 9), 9861.75)
 
 # SECOND DATACLASS
 @dataclass
@@ -42,6 +56,7 @@ class State:
 # HOMEPAGE
 @route
 def index(state: State) -> Page:
+    """Displays the homepage and orbital period input fields."""
     return Page(state, [
         "ORBITAL PERIOD CALCULATOR",
         LineBreak(),
@@ -83,7 +98,7 @@ def index(state: State) -> Page:
 def calculate(state: State, object_name: str,
               mass_sm: float, distance_au: float,
               period_unit: str) -> Page:
-
+    """Calculates and displays the orbital period."""
     if mass_sm <= 0 or distance_au <= 0:
         return Page(state, [
             "INVALID INPUT",
@@ -150,10 +165,19 @@ def calculate(state: State, object_name: str,
         Button("View History", "history")
     ])
 
+# TEST CALCULATE
+test_state_c = State(1.0, 1.0, 0.0, "", [], "days")
+calculate(test_state_c, "Earth", 1.0, 1.0, "days")
+assert_equal(test_state_c.mass_sm, 1.0)
+assert_equal(test_state_c.distance_au, 1.0)
+assert_equal(test_state_c.object_name, "Earth")
+assert_equal(test_state_c.orbital_period, 365.25)
+assert_equal(test_state_c.period_unit, "days")
+
 # SAVE CALCULATION
 @route
 def save_calculation(state: State) -> Page:
-
+    """Saves the current calculation to calculation history."""
     New_Calculation = OrbitalCalculation(
         state.object_name,
         state.mass_sm,
@@ -174,10 +198,20 @@ def save_calculation(state: State) -> Page:
         Button("Return Home", "index")
     ])
 
+
+# TEST SAVE CALCULATION
+test_state_sc = State(1.0, 1.0, 365.25, "Earth", [], "days")
+save_calculation(test_state_sc)
+assert_equal(len(test_state_sc.calculation_history), 1)
+assert_equal(test_state_sc.calculation_history[0].object_name, "Earth")
+assert_equal(test_state_sc.calculation_history[0].mass_sm, 1.0)
+assert_equal(test_state_sc.calculation_history[0].distance_au, 1.0)
+assert_equal(test_state_sc.calculation_history[0].orbital_period, 365.25)
+
 # CALCULATION HISTORY
 @route
 def history(state: State) -> Page:
-
+    """Displays all previously saved orbital calculations."""
     Content = [
         "CALCULATION HISTORY",
         LineBreak(),
@@ -214,10 +248,20 @@ def history(state: State) -> Page:
 
     return Page(state, Content)
 
+#Test History
+earth_test_h = OrbitalCalculation("Earth", 1.0, 1.0, 365.25)
+mars_test_h = OrbitalCalculation("Mars", 1.0, 1.52, 687.19)
+test_state_h = State(1.0, 1.0, 0.0, "", [earth_test_h, mars_test_h], "days")
+history(test_state_h)
+assert_equal(len(test_state_h.calculation_history), 2)
+assert_equal(test_state_h.calculation_history[0].object_name, "Earth")
+assert_equal(test_state_h.calculation_history[1].object_name, "Mars")
+
+
 # DELETE CALCULATION
 @route
 def delete_calculation(state: State, index: int) -> Page:
-
+    """Deletes a selected calculation from calculation history."""
     if index >= 0 and index < len(state.calculation_history):
         state.calculation_history.pop(index)
 
@@ -229,10 +273,18 @@ def delete_calculation(state: State, index: int) -> Page:
         Button("Return Home", "index")
     ])
 
+#Test Delete_Calculation
+earth_test_dc = OrbitalCalculation("Earth", 1.0, 1.0, 365.25)
+mars_test_dc = OrbitalCalculation("Mars", 1.0, 1.52, 687.19)
+test_state_dc = State(1.0, 1.0, 0.0, "", [earth_test_dc, mars_test_dc], "days")
+delete_calculation(test_state_dc, 0)
+assert_equal(len(test_state_dc.calculation_history), 1)
+assert_equal(test_state_dc.calculation_history[0].object_name, "Mars")
+
 # COMPARE CALCULATIONS
 @route
 def compare_calculations(state: State) -> Page:
-
+    """Compares the orbital periods of saved calculations."""
     Content = [
         "COMPARE ORBITAL CALCULATIONS",
         LineBreak(),
@@ -283,10 +335,24 @@ def compare_calculations(state: State) -> Page:
 
     return Page(state, Content)
 
+#Test Compare_Calculations
+earth_test_cc = OrbitalCalculation("Earth", 1.0, 1.0, 365.25)
+mars_test_cc = OrbitalCalculation("Mars", 1.0, 1.52, 687.19)
+mercury_test_cc = OrbitalCalculation("Mercury", 1.0, 0.39, 87.97)
+test_state_cc = State(
+        1.0, 1.0, 0.0, "",
+        [earth_test_cc, mars_test_cc, mercury_test_cc], "days"
+    )
+compare_calculations(test_state_cc)
+assert_equal(len(test_state_cc.calculation_history), 3)
+assert_equal(test_state_cc.calculation_history[0].object_name, "Earth")
+assert_equal(test_state_cc.calculation_history[1].object_name, "Mars")
+assert_equal(test_state_cc.calculation_history[2].object_name, "Mercury")
+
 # VIEW CALCULATION DETAILS
 @route
 def view_calculation(state: State, index: int) -> Page:
-
+    """Displays the details of an individual calculation."""
     if index < 0 or index >= len(state.calculation_history):
         return Page(state, [
             "Calculation not found.",
@@ -315,10 +381,19 @@ def view_calculation(state: State, index: int) -> Page:
         Button("Return to History", "history")
     ])
 
+#Test View_Calculation
+earth_test_vc = OrbitalCalculation("Earth", 1.0, 1.0, 365.25)
+mars_test_vc = OrbitalCalculation("Mars", 1.0, 1.52, 687.19)
+test_state_vc = State(1.0, 1.0, 0.0, "", [earth_test_vc, mars_test_vc], "days")
+view_calculation(test_state_vc, 0)
+assert_equal(test_state_vc.calculation_history[0].object_name, "Earth")
+assert_equal(test_state_vc.calculation_history[0].orbital_period, 365.25)
+
+
 # ABOUT PAGE
 @route
 def about(state: State) -> Page:
-
+    """Explains orbital periods and the equations used."""
     return Page(state, [
         "ABOUT ORBITAL PERIODS",
         LineBreak(),
