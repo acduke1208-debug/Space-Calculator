@@ -9,7 +9,7 @@ set_website_style("water")
 set_website_title("Orbital Period Calculator")
 set_site_information(author="Andrew Duke"
                      description="Takes distance and mass and returns the orbital period."
-                     sources="Drafter ocumentation website for coding, Dr. Bart's ChatGPT for proof reading and clarification on questions
+                     sources="Drafter ocumentation website for coding, Dr. Bart's ChatGPT for proof reading and clarification on questions"
                      planning=["https://docs.google.com/document/d/1nQMaOD2Q09LW94_xwoZu4Bna7_5Nr-hczlVxnYFCLuA/edit?tab=t.0#heading=h.1xxqmmg350hh","https://docs.google.com/document/d/1AitzQAJGSq322cufJKIWop7OXJ5Vbv9s0oPeTdhtFtY/edit?tab=t.0#heading=h.1xxqmmg350hh"]
                      links="https://acduke1208-debug.github.io/Space-Calculator/"
 )
